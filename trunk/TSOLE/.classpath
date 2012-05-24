@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="JCuda-0.4.1/jcudpp-0.4.1.jar"/>
 	<classpathentry kind="lib" path="JCuda-0.4.1/jcurand-0.4.1.jar"/>
 	<classpathentry kind="lib" path="JCuda-0.4.1/jcusparse-0.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
