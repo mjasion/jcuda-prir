@@ -48,7 +48,12 @@ public class IOLogic {
 					continue;
 				}
 				for(int i=0; i<n; i++) {
-					matrix[rowIndex][i] = Double.parseDouble(tabLine[i].trim());
+					try {
+						matrix[rowIndex][i] = Double.parseDouble(tabLine[i]);
+					} catch (NumberFormatException ex) {
+						log.error("Niepoprawny format liczby: " + tabLine[i]);
+						log.warn("Zastepcza wartosc: " + rowIndex + "x" + i + " = 0.0");
+					}
 				}
 				rowIndex++;
 			}
