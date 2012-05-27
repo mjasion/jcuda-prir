@@ -1,4 +1,4 @@
-package pl.pw.edu.prir.tsole;
+package pl.pw.edu.prir.tsole.examples;
 
 import jcuda.Pointer;
 import jcuda.Sizeof;
@@ -38,7 +38,12 @@ public class marekTesting {
 		}
 		
 		//alokacja pamieci
-		JCublas.cublasAlloc(wymMacA, Sizeof.FLOAT, pA);
+		JCublas.cublasAlloc(wymMacA*wymMacA, Sizeof.FLOAT, pA);
+		
+		
+//		JCublas.cublasSetMatrix(wymMacA, wymMacA, Sizeof.FLOAT, Pointer.to(matA), lda, B, ldb)
+		
+		
 		
 		
 		
