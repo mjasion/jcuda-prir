@@ -1,15 +1,13 @@
 package pl.pw.edu.prir.tsole;
 
+import jcuda.Pointer;
+import jcuda.Sizeof;
+import jcuda.jcublas.JCublas;
+
 import org.apache.log4j.PropertyConfigurator;
 
 import pl.pw.edu.prir.tsole.howto.Macierze;
 import pl.pw.edu.prir.tsole.io.IOLogic;
-
-import jcuda.Pointer;
-import jcuda.Sizeof;
-import jcuda.jcublas.JCublas;
-import jcuda.runtime.JCuda;
-
 /**
  * Parametry VM: -Djava.library.path=${workspace_loc:TSOLE/JCuda-0.4.1/lib}
  * 
@@ -21,7 +19,9 @@ public class Main {
 
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("log4j.properties");
-
+		Manual.parseArgs(args);
+		Manual.printWelcome();
+		
 		float[][] matrix = IOLogic.readMatrix("matrix44");
 		float[][] matrix2 = IOLogic.readMatrix("matrix44_2");
 		int rows = matrix.length;
