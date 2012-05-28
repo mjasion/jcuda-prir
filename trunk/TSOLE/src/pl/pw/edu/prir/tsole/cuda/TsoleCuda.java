@@ -1,4 +1,4 @@
-package pl.pw.edu.prir.tsole.howto;
+package pl.pw.edu.prir.tsole.cuda;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +25,16 @@ import jcuda.jcublas.JCublas;
  * 
  *         cublesZgemm
  */
-public class Macierze {
-
+public class TsoleCuda {
+	
+	
+	
+	/*
+	 * testing
+	 */
 	public static void main(String args[]) {
 
-		new Macierze().przechowywanieMacierzy();
+		new TsoleCuda().przechowywanieMacierzy();
 
 		System.out.println("test macierz");
 
@@ -51,6 +56,9 @@ public class Macierze {
 		System.out.println(wektor.length);
 	}
 
+	/**
+	 * testowanko
+	 */
 	public void przechowywanieMacierzy() {
 		System.out.println("dodawanie macierzy");
 
