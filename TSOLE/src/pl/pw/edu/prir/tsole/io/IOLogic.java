@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 
 public class IOLogic {
 	private static Logger log = Logger.getLogger(IOLogic.class);
-	public static Float[][] readMatrix(String path) {
+	public static float[][] readMatrix(String path) {
 		return readMatrix(new File(path));
 	}
 
-	public static Float[][] readMatrix(File file) {
-		Float[][] matrix = null;
+	public static float[][] readMatrix(File file) {
+		float[][] matrix = null;
 		FileReader fr;
 		BufferedReader in;
 		try {
@@ -35,7 +35,7 @@ public class IOLogic {
 			m = Integer.parseInt(tabLine[0].trim());
 			n = Integer.parseInt(tabLine[1].trim());
 			
-			matrix = new Float[m][n];
+			matrix = new float[m][n];
 			int rowIndex = 0;
 			while ((line = in.readLine()) != null) {
 				if (line.startsWith("#") || line.equals("")) // komentarz - pusta linia
@@ -70,8 +70,8 @@ public class IOLogic {
 		return matrix;
 	}
 
-	private static Float[][] zmmniejszTablice(Float[][] matrix, int rowIndex, int n) {
-		Float[][] m = new Float[rowIndex][n];
+	private static float[][] zmmniejszTablice(float[][] matrix, int rowIndex, int n) {
+		float[][] m = new float[rowIndex][n];
 		for(int i=0; i<rowIndex; i++){
 			m[i] = Arrays.copyOf(matrix[i], n);
 		}
@@ -80,7 +80,7 @@ public class IOLogic {
 		
 	}
 
-	public static void printMatrix(Float[][] matrix) {
+	public static void printMatrix(float[][] matrix) {
 		int m = matrix.length;
 		int n = matrix[0].length;
 		System.out.println(m + "x" + n);
