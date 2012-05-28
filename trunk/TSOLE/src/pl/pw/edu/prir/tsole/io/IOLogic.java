@@ -17,6 +17,9 @@ public class IOLogic {
 
 	public static float[][] readMatrix(File file) {
 		float[][] matrix = null;
+		if(file == null)
+			return null;
+		
 		FileReader fr;
 		BufferedReader in;
 		try {
@@ -86,6 +89,15 @@ public class IOLogic {
 		System.out.println(m + "x" + n);
 		for(int i=0; i<m; i++) {
 			System.out.println(Arrays.toString(matrix[i]));
+		}
+		
+	}
+	
+	public static void printMatrix(float[] matrix) {
+		int m = matrix.length;
+		System.out.println(m + "x" + 1);
+		for(int i=0; i<m; i++) {
+			System.out.println("[" + matrix[i] + "]");
 		}
 		
 	}
