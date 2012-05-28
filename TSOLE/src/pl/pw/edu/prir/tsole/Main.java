@@ -26,13 +26,21 @@ import pl.pw.edu.prir.tsole.io.IOLogic;
 
 public class Main {
 
+	private static String pathToMatrixA = null;
+	private static String pathToMatrixB = null;
+	private static String pathToOutputFile = null;
+	private static String methodSelected = null;
+	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("log4j.properties");
-		Manual.parseArgs(args);
+		
+		if (Manual.parseArgs(args) == 1)
+			return;
+		
 		Manual.printWelcome();
 		
-		float[][] matrix = IOLogic.readMatrix("matrixA");
-		float[][] matrix2 = IOLogic.readMatrix("matrixB");
+		float[][] matrix = IOLogic.readMatrix(pathToMatrixA);
+		float[][] matrix2 = IOLogic.readMatrix(pathToMatrixB);
 		int rows = matrix.length;
 		int cols = matrix[0].length;
 		
@@ -131,6 +139,38 @@ public class Main {
 		// Float matrixAfter[][] = Macierze.vectorToMAtrix(cudaVector_A,
 		// matrix.length, matrix[0].length);
 
+	}
+
+	public static String getPathToMatrixA() {
+		return pathToMatrixA;
+	}
+
+	public static String getPathToMatrixB() {
+		return pathToMatrixB;
+	}
+
+	public static String getMethodSelected() {
+		return methodSelected;
+	}
+
+	public static void setPathToMatrixA(String pathToMatrixA) {
+		Main.pathToMatrixA = pathToMatrixA;
+	}
+
+	public static void setPathToMatrixB(String pathToMatrixB) {
+		Main.pathToMatrixB = pathToMatrixB;
+	}
+
+	public static void setMethodSelected(String methodSelected) {
+		Main.methodSelected = methodSelected;
+	}
+
+	public static String getPathToOutputFile() {
+		return pathToOutputFile;
+	}
+
+	public static void setPathToOutputFile(String pathToOutputFile) {
+		Main.pathToOutputFile = pathToOutputFile;
 	}
 
 }
