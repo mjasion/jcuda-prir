@@ -137,9 +137,22 @@ public class TsoleCuda {
 	public static float[] matrixToVector(float[][] macierz, int rows, int cols){
 		List<Float> tempVector = new ArrayList<>();
 		
+//		for(int i =0; i < rows;i++){
+//			for(int j = 0; j < cols; j++)
+//				tempVector.add(macierz[i][j]);
+//		}
+//		
+//		float[] jcudaVector = new float[tempVector.size()];
+//		
+//		for(int i=0; i < tempVector.size(); i++){
+//			jcudaVector[i] = tempVector.get(i);
+//		}
+		
+		/* specjalnie odwrotna kolejnosc */
+		
 		for(int i =0; i < rows;i++){
 			for(int j = 0; j < cols; j++)
-				tempVector.add(macierz[i][j]);
+				tempVector.add(macierz[j][i]);
 		}
 		
 		float[] jcudaVector = new float[tempVector.size()];

@@ -1,5 +1,6 @@
 package pl.pw.edu.prir.tsole;
 
+import jcuda.LogLevel;
 import jcuda.Pointer;
 import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
@@ -15,6 +16,14 @@ import pl.pw.edu.prir.tsole.io.IOLogic;
  * 
  */
 
+
+/**
+ * 
+ * TODO:
+ * 	-
+ *
+ */
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -22,48 +31,99 @@ public class Main {
 		Manual.parseArgs(args);
 		Manual.printWelcome();
 		
-		float[][] matrix = IOLogic.readMatrix("matrix44");
-		float[][] matrix2 = IOLogic.readMatrix("matrix44_2");
+		float[][] matrix = IOLogic.readMatrix("matrixA");
+		float[][] matrix2 = IOLogic.readMatrix("matrixB");
 		int rows = matrix.length;
 		int cols = matrix[0].length;
+		
 		IOLogic.printMatrix(matrix);
 		IOLogic.printMatrix(matrix2);
 
 		/* do jcudy */
 		// matrix A
 		Pointer pa = new Pointer();
-		float cudaVector_A[] = TsoleCuda.matrixToVector(matrix, rows, matrix[0].length);
-		// matrix B
+		float cudaVector_A[] = TsoleCuda.matrixToVector(matrix, rows, cols);
+		// vector B
 		Pointer pb = new Pointer();
-		float cudaVector_B[];
+		float cudaVector_B[] = TsoleCuda.matrixToVector(matrix2, 1, rows);
+		
+		System.out.println("print vector B");
+		IOLogic.printMatrix(cudaVector_B);
+//		float cudaVector_B[] = TsoleCuda.matrixToVector(matrix2, rowsB, colsB);
+	
 		// matrix C
 		Pointer pc = new Pointer();
-		float cudaVector_C[] = new float[rows * cols];
-		float resultMatrix_C[][];
+		float cudaVector_C[] = new float[rows];
 
 		// inicjalizacja jcublas
 		JCublas.cublasInit();
+		JCublas.setLogLevel(LogLevel.LOG_TRACE);
 		
 		// alokacja pamieci
-		int result = JCublas.cublasAlloc(rows * cols, Sizeof.FLOAT, pa);
+		if(JCublas.cublasAlloc(rows * cols, Sizeof.FLOAT, pa) != 0)
+			System.err.println("bład alokacji wskaznika pa");
+		
+		if(JCublas.cublasAlloc(rows , Sizeof.FLOAT, pb) != 0)
+			System.err.println("bład alokacji wskaznika pb");
+		
+		if(JCublas.cublasAlloc(rows , Sizeof.FLOAT, pc) != 0)
+			System.err.println("bład alokacji wskaznika pc");
 		
 		// przerzucenie danych do gpu
 		JCublas.cublasSetMatrix(rows, cols, Sizeof.FLOAT, Pointer.to(cudaVector_A), rows, pa, cols);
+		JCublas.cublasSetVector(rows, Sizeof.FLOAT, Pointer.to(cudaVector_B), 1, pb, 1);
 		
-		
+		JCublas.printVector(rows, pb);
+		JCublas.cublasSaxpy(1, 2, pb, 2, pc, 2);
+		JCublas.printVector(rows, pc);
 		
 		// wywolanie funkcji ,ktora beda obliczac w cudzie
+		/* 1. Gauss-Jordan */
 		
+			/* a) dla kazdego wiersza
+			 * 			wsp = matrix[i][i]
+			 */
+		
+
+		JCublas.printMatrix(rows, pa, cols);
+//		JCublas.printVector(1, pb);
+//			float wsp;
+//			for(int i =0; i < rows; i++){
+//				wsp = matrix[i][i];
+//				
+//				//podziel macierz A
+//				for(int j=0; j < cols; j++){
+//					
+//				}
+//				//podziel wektor B
+//				
+//				for(int k=0; k < rows; k++){
+//					if(k==i) continue;	
+//					
+//					
+//					
+//					
+//				}
+//				
+//			}
+
+		
+		
+		/*-----------------*/
 		
 		//pobranie wynikow
-		JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, pa, rows, Pointer.to(cudaVector_C), cols);
+		JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, pb, rows, Pointer.to(cudaVector_C), cols);
+		JCublas.cublasGetVector(rows, Sizeof.FLOAT, pb, 1, Pointer.to(cudaVector_C), 1);
 		
-		System.out.println("pobrane z gpu<< powinno sie zgadzac z 1 macierza>>");
-		resultMatrix_C = TsoleCuda.vectorToMAtrix(cudaVector_C, rows, cols);
-		IOLogic.printMatrix(resultMatrix_C);
+		System.out.println("iologic print");
+		IOLogic.printMatrix(cudaVector_C);
+		
+		
 		
 		//zwolnienie pamieci
 		JCublas.cublasFree(pa);
+		JCublas.cublasFree(pb);
+		JCublas.cublasFree(pc);
 		
 		//
 		JCublas.cublasShutdown();
