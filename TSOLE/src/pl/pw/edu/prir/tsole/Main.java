@@ -6,7 +6,7 @@ import jcuda.jcublas.JCublas;
 
 import org.apache.log4j.PropertyConfigurator;
 
-import pl.pw.edu.prir.tsole.howto.Macierze;
+import pl.pw.edu.prir.tsole.cuda.TsoleCuda;
 import pl.pw.edu.prir.tsole.io.IOLogic;
 /**
  * Parametry VM: -Djava.library.path=${workspace_loc:TSOLE/JCuda-0.4.1/lib}
@@ -32,7 +32,7 @@ public class Main {
 		/* do jcudy */
 		// matrix A
 		Pointer pa = new Pointer();
-		float cudaVector_A[] = Macierze.matrixToVector(matrix, rows, matrix[0].length);
+		float cudaVector_A[] = TsoleCuda.matrixToVector(matrix, rows, matrix[0].length);
 		// matrix B
 		Pointer pb = new Pointer();
 		float cudaVector_B[];
@@ -47,7 +47,7 @@ public class Main {
 		// alokacja pamieci
 		int result = JCublas.cublasAlloc(rows * cols, Sizeof.FLOAT, pa);
 		
-		// przerzuceie danych do gpu
+		// przerzucenie danych do gpu
 		JCublas.cublasSetMatrix(rows, cols, Sizeof.FLOAT, Pointer.to(cudaVector_A), rows, pa, cols);
 		
 		
@@ -59,7 +59,7 @@ public class Main {
 		JCublas.cublasGetMatrix(rows, cols, Sizeof.FLOAT, pa, rows, Pointer.to(cudaVector_C), cols);
 		
 		System.out.println("pobrane z gpu<< powinno sie zgadzac z 1 macierza>>");
-		resultMatrix_C = Macierze.vectorToMAtrix(cudaVector_C, rows, cols);
+		resultMatrix_C = TsoleCuda.vectorToMAtrix(cudaVector_C, rows, cols);
 		IOLogic.printMatrix(resultMatrix_C);
 		
 		//zwolnienie pamieci
