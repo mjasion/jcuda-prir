@@ -2,8 +2,25 @@ package pl.pw.edu.prir.tsole;
 
 public class Manual {
 
-	public static void parseArgs(String[] args) {
-		
+	public static int parseArgs(String[] args) {
+		if (args.length == 1 && args[0].equals("-h")) {
+			printHelp();
+			return 1;
+		}
+		else if (args.length == 6 && args[0].equals("-a") && args[2].equals("-b") && args[4].equals("-m")) {
+			Main.setPathToMatrixA(args[1]);
+			Main.setPathToMatrixB(args[3]);
+			Main.setMethodSelected(args[5]);
+			return 0;
+		}
+		else if (args.length == 8 && args[0].equals("-a") && args[2].equals("-b") && args[4].equals("-m") && args[6].equals("-o")) {
+			Main.setPathToMatrixA(args[1]);
+			Main.setPathToMatrixB(args[3]);
+			Main.setMethodSelected(args[5]);
+			Main.setPathToOutputFile(args[7]);
+			return 0;
+		}
+		return 1;
 	}
 	
 	public static void printHelp() {
