@@ -126,30 +126,40 @@ public class Macierze {
 	 * 
 	 */
 	
-	public Float[] matrixToVector(Float[][] macierz, int rows, int cols){
-		List<Float> jcudaVector = new ArrayList<>();
+	public static float[] matrixToVector(float[][] macierz, int rows, int cols){
+		List<Float> tempVector = new ArrayList<>();
 		
 		for(int i =0; i < rows;i++){
 			for(int j = 0; j < cols; j++)
-				jcudaVector.add(macierz[i][j]);
+				tempVector.add(macierz[i][j]);
 		}
 		
-		return (Float[])jcudaVector.toArray();
+		float[] jcudaVector = new float[tempVector.size()];
+		
+		for(int i=0; i < tempVector.size(); i++){
+			jcudaVector[i] = tempVector.get(i);
+		}
+		
+		return jcudaVector;
 	}
 
 	/**
 	 * funkcje zamieniajca wektor na macierz
 	 */
 	
-	public Float[][] vectorToMAtrix(float[] vector, int cols, int rows){
+	public static float[][] vectorToMAtrix(float[] vector, int rows, int cols){
 		
-		/**
-		 * TODO:
-		 * 
-		 * 
-		 */
+		float matrix[][] = new float[rows][cols];
+		int i = 0;
 		
-		return null;
+		for(int j = 0; j < rows; j++){
+			for(int k =0; k < cols; k++){
+				matrix[j][k] = vector[i];
+				i++;
+			}
+		}
+		
+		return matrix;
 	}
 	
 
