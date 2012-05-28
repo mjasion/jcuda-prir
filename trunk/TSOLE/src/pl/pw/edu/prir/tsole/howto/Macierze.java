@@ -126,7 +126,7 @@ public class Macierze {
 	 * 
 	 */
 	
-	public Float[] vectorToMaxtrix(float[][] macierz, int rows, int cols){
+	public Float[] matrixToVector(Float[][] macierz, int rows, int cols){
 		List<Float> jcudaVector = new ArrayList<>();
 		
 		for(int i =0; i < rows;i++){
@@ -141,7 +141,7 @@ public class Macierze {
 	 * funkcje zamieniajca wektor na macierz
 	 */
 	
-	public Float[][] matrixToVector(float[] vector, int cols, int rows){
+	public Float[][] vectorToMAtrix(float[] vector, int cols, int rows){
 		
 		/**
 		 * TODO:

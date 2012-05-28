@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 
 public class IOLogic {
 	private static Logger log = Logger.getLogger(IOLogic.class);
-	public static double[][] readMatrix(String path) {
+	public static Float[][] readMatrix(String path) {
 		return readMatrix(new File(path));
 	}
 
-	public static double[][] readMatrix(File file) {
-		double[][] matrix = null;
+	public static Float[][] readMatrix(File file) {
+		Float[][] matrix = null;
 		FileReader fr;
 		BufferedReader in;
 		try {
@@ -35,7 +35,7 @@ public class IOLogic {
 			m = Integer.parseInt(tabLine[0].trim());
 			n = Integer.parseInt(tabLine[1].trim());
 			
-			matrix = new double[m][n];
+			matrix = new Float[m][n];
 			int rowIndex = 0;
 			while ((line = in.readLine()) != null) {
 				if (line.startsWith("#") || line.equals("")) // komentarz - pusta linia
@@ -49,7 +49,7 @@ public class IOLogic {
 				}
 				for(int i=0; i<n; i++) {
 					try {
-						matrix[rowIndex][i] = Double.parseDouble(tabLine[i]);
+						matrix[rowIndex][i] = Float.parseFloat(tabLine[i]);
 					} catch (NumberFormatException ex) {
 						log.error("Niepoprawny format liczby: " + tabLine[i]);
 						log.warn("Zastepcza wartosc: " + rowIndex + "x" + i + " = 0.0");
@@ -70,8 +70,8 @@ public class IOLogic {
 		return matrix;
 	}
 
-	private static double[][] zmmniejszTablice(double[][] matrix, int rowIndex, int n) {
-		double[][] m = new double[rowIndex][n];
+	private static Float[][] zmmniejszTablice(Float[][] matrix, int rowIndex, int n) {
+		Float[][] m = new Float[rowIndex][n];
 		for(int i=0; i<rowIndex; i++){
 			m[i] = Arrays.copyOf(matrix[i], n);
 		}
@@ -80,7 +80,7 @@ public class IOLogic {
 		
 	}
 
-	public static void printMatrix(double[][] matrix) {
+	public static void printMatrix(Float[][] matrix) {
 		int m = matrix.length;
 		int n = matrix[0].length;
 		System.out.println(m + "x" + n);
