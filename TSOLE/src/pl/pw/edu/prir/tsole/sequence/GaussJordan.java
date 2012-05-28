@@ -20,19 +20,19 @@ public class GaussJordan {
 		for(int i = 0; i<m; i++) {
 			wsp = matrixA[i][i];
 			for(int j=0; j<n; j++) {
-				matrixA[i][j] = matrixA[i][j]/wsp;
+				matrixA[i][j] = matrixA[i][j]/wsp;	//2.9
 			}
-			matrixB[i][0] = matrixB[i][0]/wsp;
+			matrixB[i][0] = matrixB[i][0]/wsp;		// 2.9 - na macierzy B ;]
 			
-			for(int j=0; j<m; j++) {
-				if(j==i) continue;
+			for(int j=0; j<m; j++) {			// 2.9 - 2.24 :D - cala reszta
+				if(j==i) continue;				// jesli ta sama linia co wyzej, to pomin
 				
-				wsp = matrixA[j][i];
-				for(int k=0; k<n; k++) {
-					matrixA[j][k] = matrixA[j][k] - matrixA[i][k] * wsp;
+				wsp = matrixA[j][i];			// wspolczynnik rozwiazywanego rownania(np. a21)
+				for(int k=0; k<n; k++) {		
+					matrixA[j][k] = matrixA[j][k] - matrixA[i][k] * wsp;	// 2.10 i 2.11 mnozenie a nastepnie odejmowanie 
 				}
 				
-				matrixB[j][0] = matrixB[j][0] - matrixB[i][0] * wsp;
+				matrixB[j][0] = matrixB[j][0] - matrixB[i][0] * wsp;		// 2.10 i 2.11 - dla macierzy B
 			}
 			
 		}
