@@ -93,6 +93,17 @@ public class IOLogic {
 		
 	}
 	
+	public static void printMatrix(double[][] matrix) {
+		int m = matrix.length;
+		int n = matrix[0].length;
+		System.out.println(m + "x" + n);
+		for(int i=0; i<m; i++) {
+			System.out.println(Arrays.toString(matrix[i]));
+		}
+		
+	}
+	
+	
 	public static void printMatrix(float[] matrix) {
 		int m = matrix.length;
 		System.out.println(m + "x" + 1);
