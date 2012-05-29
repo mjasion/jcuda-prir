@@ -35,7 +35,7 @@ import jcuda.jcublas.JCublas;
  * 
  *         cublasSsymm
  * 
- *         cublasStrmm - mnozenie macierzy ?
+ *         cublasStrmm - 
  * 
  *         cublasStrsm -
  * 
@@ -45,8 +45,10 @@ public class TsoleCuda {
 
 	/**
 	 * 
-	 * odwrocenie macierzy A, nadpisuje ją.
-	 * 
+	 * @param size
+	 * 		wymiar macierzy(1)
+	 * @param A 
+	 * 		macierz
 	 */
 	public static void invertMatrix(int size, float A[]) {
 		Pointer pa = new Pointer();
@@ -65,17 +67,25 @@ public class TsoleCuda {
 
 	public static void invertMatrix(int n, Pointer pa) {
 		// LU
-		int pivots[] = cudaSgetrfSquare(n, pa);
+		int pivots[] = factorizeLU(n, pa);
 
-		// Perform inversion on factorized matrix
-		cudaSgetri(n, pa, pivots);
+		doInversion(n, pa, pivots);
 	}
 	
 	/*
 	 * 
 	 */
 
-	private static int[] cudaSgetrfSquare(int size, Pointer pa) {
+	/**
+	 * 
+	 * @param size
+	 * 		wym macierzy
+	 * @param pa
+	 * 		macierz(wskaznik)
+	 * @return 
+	 * 		os
+	 */
+	private static int[] factorizeLU(int size, Pointer pa) {
 		int[] pivots = new int[size];
 
 		for (int i = 0; i < size; i++) {
@@ -87,35 +97,45 @@ public class TsoleCuda {
 		
 		for (int i = 0; i < size - 1; i++) {
 			//po diag.
-			Pointer przesuniecie = at(pa, i * size + i);
+			Pointer offset = at(pa, i * size + i);
 				
-			int pivot = i - 1 + cublasIsamax(size - i, przesuniecie, 1);
+			int pivot = i - 1 + cublasIsamax(size - i, offset, 1);
 			if (pivot != i) {
 				pivots[i] = pivot;
 				cublasSswap(size, at(pa, pivot), size, at(pa, i), size);
 			}
-
-			cublasGetVector(1, Sizeof.FLOAT, przesuniecie, 1, pf, 1);
-			cublasSscal(size - i - 1, 1 / factor[0], at(przesuniecie, 1), 1);
-			cublasSger(size - i - 1, size - i - 1, -1.0f, at(przesuniecie, 1), 1, at(przesuniecie, size), size, at(przesuniecie, size + 1), size);
+			//pobr z pamieci
+			cublasGetVector(1, Sizeof.FLOAT, offset, 1, pf, 1);
+			// x = alpha*x
+			cublasSscal(size - i - 1, 1 / factor[0], at(offset, 1), 1);
+			
+			cublasSger(size - i - 1, size - i - 1, -1.0f, at(offset, 1), 1, at(offset, size), size, at(offset, size + 1), size);
 		}
 		
 		return pivots;
 	}
+	
+	/**
+	 * 
+	 * 
+	 * @param n
+	 * @param pa
+	 * @param pivots
+	 */
 
-	private static void cudaSgetri(int n, Pointer dA, int[] pivots) {
-		// Perform inv(U)
-		cudaStrtri(n, dA);
+	private static void doInversion(int n, Pointer pa, int[] pivots) {
+		
+		inverseUpperTriangle(n, pa);
 
 		// Solve inv(A)*L = inv(U)
 		Pointer dWork = new Pointer();
 		cublasAlloc(n - 1, Sizeof.FLOAT, dWork);
 
 		for (int i = n - 1; i > 0; i--) {
-			Pointer offset = at(dA, ((i - 1) * n + i));
+			Pointer offset = at(pa, ((i - 1) * n + i));
 			cudaMemcpy(dWork, offset, (n - 1) * Sizeof.FLOAT, cudaMemcpyDeviceToDevice);
 			cublasSscal(n - i, 0, offset, 1);
-			cublasSgemv('n', n, n - i, -1.0f, at(dA, i * n), n, dWork, 1, 1.0f, at(dA, ((i - 1) * n)), 1);
+			cublasSgemv('n', n, n - i, -1.0f, at(pa, i * n), n, dWork, 1, 1.0f, at(pa, ((i - 1) * n)), 1);
 		}
 
 		cublasFree(dWork);
@@ -123,21 +143,22 @@ public class TsoleCuda {
 		// Pivot back to original order
 		for (int i = n - 1; i >= 0; i--) {
 			if (i != pivots[i]) {
-				cublasSswap(n, at(dA, i * n), 1, at(dA, pivots[i] * n), 1);
+				cublasSswap(n, at(pa, i * n), 1, at(pa, pivots[i] * n), 1);
 			}
 		}
 
 	}
 
-	private static void cudaStrtri(int n, Pointer dA) {
+	private static void inverseUpperTriangle(int size, Pointer pa) {
 		float[] factor = { 0.0f };
 		Pointer pFactor = Pointer.to(factor);
-		for (int i = 0; i < n; i++) {
-			Pointer offset = at(dA, i * n);
+		for (int i = 0; i < size; i++) {
+			Pointer offset = at(pa, i * size);
 			cublasGetVector(1, Sizeof.FLOAT, at(offset, i), 1, pFactor, 1);
 			factor[0] = 1 / factor[0];
 			cublasSetVector(1, Sizeof.FLOAT, pFactor, 1, at(offset, i), 1);
-			cublasStrmv('u', 'n', 'n', i, dA, n, offset, 1);
+			cublasStrmv('u', 'n', 'n', i, pa, size, offset, 1);
+			// x = alpha*x
 			cublasSscal(i, -factor[0], offset, 1);
 		}
 	}
