@@ -4,7 +4,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import pl.pw.edu.prir.tsole.io.IOLogic;
 
-public class GaussJordan {
+public class GaussJordan implements ISequenceAlgorithm{
 	private float[][] matrixA;
 	private float[][] matrixB;
 	public GaussJordan(float[][] A,  float[][] B) {
