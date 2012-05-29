@@ -41,23 +41,13 @@ public class Main {
 		IOLogic.printMatrix(matrix2);
 
 		/* do jcudy */
-		// matrix A
-		Pointer pa = new Pointer();
+		//macierz(wektor) A
 		float cudaVector_A[] = TsoleCuda.matrixToVector(matrix, rows, cols);
 		// odwrotnosc A
 		float invA[] = cudaVector_A.clone();
-
-		// vector B
-		Pointer pb = new Pointer();
+		// wektor y(B)
 		float cudaVector_B[] = TsoleCuda.matrixToVector(matrix2, 1, rows);
-
-		System.out.println("print vector B");
-		IOLogic.printMatrix(cudaVector_B);
-		// float cudaVector_B[] = TsoleCuda.matrixToVector(matrix2, rowsB,
-		// colsB);
-
-		// matrix C
-		Pointer pc = new Pointer();
+		// macierz(wektor) X
 		float cudaVector_C[] = new float[rows];
 
 		for (int i = 0; i < rows; i++)
@@ -67,99 +57,23 @@ public class Main {
 		JCublas.cublasInit();
 		// JCublas.setLogLevel(LogLevel.LOG_TRACE);
 
-		// alokacja pamieci
-		// if(JCublas.cublasAlloc(rows * cols, Sizeof.FLOAT, pa) != 0)
-		// System.err.println("bład alokacji wskaznika pa");
-		//
-		// if(JCublas.cublasAlloc(rows , Sizeof.FLOAT, pb) != 0)
-		// System.err.println("bład alokacji wskaznika pb");
-		//
-		// if(JCublas.cublasAlloc(rows , Sizeof.FLOAT, pc) != 0)
-		// System.err.println("bład alokacji wskaznika pc");
-
-		// przerzucenie danych do gpu
-		// JCublas.cublasSetMatrix(rows, cols, Sizeof.FLOAT,
-		// Pointer.to(cudaVector_A), rows, pa, cols);
-		// JCublas.cublasSetVector(rows, Sizeof.FLOAT, Pointer.to(cudaVector_B),
-		// 1, pb, 1);
-		// JCublas.cublasSetVector(rows, Sizeof.FLOAT, Pointer.to(cudaVector_C),
-		// 1, pc, 1);
-
-		// JCublas.printVector(rows, pb);
-		// //// JCublas.cublasSaxpy(rows, 1, pb, 1, pc, 1);
-		// JCublas.cublasCsscal(3, 2, pb.withByteOffset(1 * Sizeof.FLOAT), 1);
-		// //mnozy wektor przez skalar
-		// JCublas.printVector(rows, pb);
-
-		// wywolanie funkcji ,ktora beda obliczac w cudzie
-		/* 1. Gauss-Jordan */// +wyznacznik !
-		// AX=B -> X = A^-1 B
-
-		// a ) odwrocenie macierzy A
-
-		// JCublas.printMatrix(rows, pa, cols);
-		// JCublas.printVector(1, pb);
-		// float wsp;
-		// for(int i =0; i < rows; i++){
-		// wsp = matrix[i][i];
-		//
-		// //podziel macierz A
-		// for(int j=0; j < cols; j++){
-		//
-		// }
-		// //podziel wektor B
-		//
-		// for(int k=0; k < rows; k++){
-		// if(k==i) continue;
-		//
-		//
-		//
-		//
-		// }
-		//
-		// }
 
 		TsoleCuda.invertMatrix(rows, invA);
 		float jednostkowa[] = new float[rows * rows];
 		TsoleCuda.multiply(rows, cudaVector_A, invA, jednostkowa);
 
-		System.out.println("macierz jednostkowa");
-		IOLogic.printMatrix(jednostkowa);
-		System.out.println("macierz A");
-		IOLogic.printMatrix(cudaVector_A);
-		System.out.println("macierz inv A");
-		IOLogic.printMatrix(invA);
-		
-		
-
-		/*-----------------*/
-
-		// pobranie wynikow
-		// JCublas.cublasGetVector(rows, Sizeof.FLOAT, pb, 1,
-		// Pointer.to(cudaVector_C), 1);
-		//
-		// System.out.println("iologic print");
-		// IOLogic.printMatrix(cudaVector_C);
-		//
-		//
-		//
-		// //zwolnienie pamieci
-		// JCublas.cublasFree(pa);
-		// JCublas.cublasFree(pb);
-		// JCublas.cublasFree(pc);
 
 	
-		System.out.println("macierz jednostkowa");
-		IOLogic.printMatrix(TsoleCuda.vectorToMAtrix(jednostkowa, rows, cols));
-		System.out.println("macierz A");
+//		System.out.println("macierz jednostkowa");
+//		IOLogic.printMatrix(TsoleCuda.vectorToMAtrix(jednostkowa, rows, cols));
+		System.out.println("\nmacierz A");
 		IOLogic.printMatrix(TsoleCuda.vectorToMAtrix(cudaVector_A, rows, cols));
-		System.out.println("macierz inv A");
+		System.out.println("\nmacierz inv A");
 		IOLogic.printMatrix(TsoleCuda.vectorToMAtrix(invA, rows, cols));
-		System.out.println("wektor C!!!");
+		System.out.println("\nwektor X");
 		TsoleCuda.multiply(rows, invA, cudaVector_B, cudaVector_C);
 		IOLogic.printMatrix(cudaVector_C);
-		// Float matrixAfter[][] = Macierze.vectorToMAtrix(cudaVector_A,
-		// matrix.length, matrix[0].length);
+		
 		JCublas.cublasShutdown();
 	}
 
