@@ -37,52 +37,69 @@ import jcuda.jcublas.JCublas;
  * 
  *         cublasStrmm - mnozenie macierzy ?
  * 
- *         cublasStrsm - wyglada na rozwiazanie ukladu rownan
+ *         cublasStrsm -
  * 
  *         cublesZgemm
  */
 public class TsoleCuda {
 
-	public static void invertMatrix(int n, float A[]) {
-		Pointer dA = new Pointer();
-		cublasAlloc(n * n, Sizeof.FLOAT, dA);
-		cublasSetMatrix(n, n, Sizeof.FLOAT, Pointer.to(A), n, dA, n);
+	/**
+	 * 
+	 * odwrocenie macierzy A, nadpisuje ją.
+	 * 
+	 */
+	public static void invertMatrix(int size, float A[]) {
+		Pointer pa = new Pointer();
+		// alokacja
+		cublasAlloc(size * size, Sizeof.FLOAT, pa);
+		// kopiowanie na gpu
+		cublasSetMatrix(size, size, Sizeof.FLOAT, Pointer.to(A), size, pa, size);
 
-		invertMatrix(n, dA);
+		invertMatrix(size, pa);
 
-		cublasGetMatrix(n, n, Sizeof.FLOAT, dA, n, Pointer.to(A), n);
-		cublasFree(dA);
+		// odebranie z gpu
+		cublasGetMatrix(size, size, Sizeof.FLOAT, pa, size, Pointer.to(A), size);
+		// porzadki
+		cublasFree(pa);
 	}
 
-	public static void invertMatrix(int n, Pointer dA) {
-		// Perform LU factorization
-		int[] pivots = cudaSgetrfSquare(n, dA);
+	public static void invertMatrix(int n, Pointer pa) {
+		// LU
+		int pivots[] = cudaSgetrfSquare(n, pa);
 
 		// Perform inversion on factorized matrix
-		cudaSgetri(n, dA, pivots);
+		cudaSgetri(n, pa, pivots);
 	}
+	
+	/*
+	 * 
+	 */
 
-	private static int[] cudaSgetrfSquare(int n, Pointer dA) {
-		int[] pivots = new int[n];
-		for (int i = 0; i < n; i++) {
+	private static int[] cudaSgetrfSquare(int size, Pointer pa) {
+		int[] pivots = new int[size];
+
+		for (int i = 0; i < size; i++) {
 			pivots[i] = i;
 		}
 
-		float[] factor = { 0.0f };
-		Pointer pFactor = Pointer.to(factor);
-		for (int i = 0; i < n - 1; i++) {
-			Pointer offset = at(dA, i * n + i);
-
-			int pivot = i - 1 + cublasIsamax(n - i, offset, 1);
+		float factor[] = { 0.0f };
+		Pointer pf = Pointer.to(factor);
+		
+		for (int i = 0; i < size - 1; i++) {
+			//po diag.
+			Pointer przesuniecie = at(pa, i * size + i);
+				
+			int pivot = i - 1 + cublasIsamax(size - i, przesuniecie, 1);
 			if (pivot != i) {
 				pivots[i] = pivot;
-				cublasSswap(n, at(dA, pivot), n, at(dA, i), n);
+				cublasSswap(size, at(pa, pivot), size, at(pa, i), size);
 			}
 
-			cublasGetVector(1, Sizeof.FLOAT, offset, 1, pFactor, 1);
-			cublasSscal(n - i - 1, 1 / factor[0], at(offset, 1), 1);
-			cublasSger(n - i - 1, n - i - 1, -1.0f, at(offset, 1), 1, at(offset, n), n, at(offset, n + 1), n);
+			cublasGetVector(1, Sizeof.FLOAT, przesuniecie, 1, pf, 1);
+			cublasSscal(size - i - 1, 1 / factor[0], at(przesuniecie, 1), 1);
+			cublasSger(size - i - 1, size - i - 1, -1.0f, at(przesuniecie, 1), 1, at(przesuniecie, size), size, at(przesuniecie, size + 1), size);
 		}
+		
 		return pivots;
 	}
 
@@ -129,23 +146,32 @@ public class TsoleCuda {
 		return p.withByteOffset(floatOffset * Sizeof.FLOAT);
 	}
 
+	/**
+	 * mnozenie macierzy wynikowa C zostaje nadpisana
+	 * 
+	 * @param size
+	 * @param A
+	 * @param B
+	 * @param C
+	 */
+
 	public static void multiply(int size, float A[], float B[], float C[]) {
-		Pointer dA = new Pointer();
-		Pointer dB = new Pointer();
-		Pointer dC = new Pointer();
+		Pointer pa = new Pointer();
+		Pointer pb = new Pointer();
+		Pointer pc = new Pointer();
 
-		cublasAlloc(size * size, Sizeof.FLOAT, dA);
-		cublasAlloc(size * size, Sizeof.FLOAT, dB);
-		cublasAlloc(size * size, Sizeof.FLOAT, dC);
-		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(A), 1, dA, 1);
-		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(B), 1, dB, 1);
+		cublasAlloc(size * size, Sizeof.FLOAT, pa);
+		cublasAlloc(size * size, Sizeof.FLOAT, pb);
+		cublasAlloc(size * size, Sizeof.FLOAT, pc);
+		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(A), 1, pa, 1);
+		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(B), 1, pb, 1);
 
-		cublasSgemm('n', 'n', size, size, size, 1, dA, size, dB, size, 0, dC, size);
+		cublasSgemm('n', 'n', size, size, size, 1, pa, size, pb, size, 0, pc, size);
 
-		cublasGetVector(size * size, Sizeof.FLOAT, dC, 1, Pointer.to(C), 1);
-		cublasFree(dA);
-		cublasFree(dB);
-		cublasFree(dC);
+		cublasGetVector(size * size, Sizeof.FLOAT, pc, 1, Pointer.to(C), 1);
+		cublasFree(pa);
+		cublasFree(pb);
+		cublasFree(pc);
 	}
 
 	/*
@@ -194,10 +220,6 @@ public class TsoleCuda {
 			C[i] = 0;
 		}
 
-		// wypisanie macierzy A
-		System.out.println("A:");
-		System.out.println(toString2D(A, matrixSize));
-
 		// inicjalizacja
 		JCublas.cublasInit();
 
@@ -227,24 +249,9 @@ public class TsoleCuda {
 		// finito
 		JCublas.cublasShutdown();
 
-		// wypisanie macierzy C
-		System.out.println("C:");
-		System.out.println(toString2D(C, matrixSize));
-
 		System.out.println("test");
 		System.out.println(C[0]);
 
-	}
-
-	private static String toString2D(float[] a, int columns) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < a.length; i++) {
-			if (i > 0 && i % columns == 0) {
-				sb.append("\n");
-			}
-			sb.append(String.format("%7.4f ", a[i]));
-		}
-		return sb.toString();
 	}
 
 	/**
