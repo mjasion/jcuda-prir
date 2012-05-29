@@ -1,5 +1,21 @@
 package pl.pw.edu.prir.tsole.cuda;
 
+import static jcuda.jcublas.JCublas.cublasAlloc;
+import static jcuda.jcublas.JCublas.cublasFree;
+import static jcuda.jcublas.JCublas.cublasGetMatrix;
+import static jcuda.jcublas.JCublas.cublasGetVector;
+import static jcuda.jcublas.JCublas.cublasIsamax;
+import static jcuda.jcublas.JCublas.cublasSetMatrix;
+import static jcuda.jcublas.JCublas.cublasSetVector;
+import static jcuda.jcublas.JCublas.cublasSgemm;
+import static jcuda.jcublas.JCublas.cublasSgemv;
+import static jcuda.jcublas.JCublas.cublasSger;
+import static jcuda.jcublas.JCublas.cublasSscal;
+import static jcuda.jcublas.JCublas.cublasSswap;
+import static jcuda.jcublas.JCublas.cublasStrmv;
+import static jcuda.runtime.JCuda.cudaMemcpy;
+import static jcuda.runtime.cudaMemcpyKind.cudaMemcpyDeviceToDevice;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +42,112 @@ import jcuda.jcublas.JCublas;
  *         cublesZgemm
  */
 public class TsoleCuda {
-	
-	
-	
+
+	public static void invertMatrix(int n, float A[]) {
+		Pointer dA = new Pointer();
+		cublasAlloc(n * n, Sizeof.FLOAT, dA);
+		cublasSetMatrix(n, n, Sizeof.FLOAT, Pointer.to(A), n, dA, n);
+
+		invertMatrix(n, dA);
+
+		cublasGetMatrix(n, n, Sizeof.FLOAT, dA, n, Pointer.to(A), n);
+		cublasFree(dA);
+	}
+
+	public static void invertMatrix(int n, Pointer dA) {
+		// Perform LU factorization
+		int[] pivots = cudaSgetrfSquare(n, dA);
+
+		// Perform inversion on factorized matrix
+		cudaSgetri(n, dA, pivots);
+	}
+
+	private static int[] cudaSgetrfSquare(int n, Pointer dA) {
+		int[] pivots = new int[n];
+		for (int i = 0; i < n; i++) {
+			pivots[i] = i;
+		}
+
+		float[] factor = { 0.0f };
+		Pointer pFactor = Pointer.to(factor);
+		for (int i = 0; i < n - 1; i++) {
+			Pointer offset = at(dA, i * n + i);
+
+			int pivot = i - 1 + cublasIsamax(n - i, offset, 1);
+			if (pivot != i) {
+				pivots[i] = pivot;
+				cublasSswap(n, at(dA, pivot), n, at(dA, i), n);
+			}
+
+			cublasGetVector(1, Sizeof.FLOAT, offset, 1, pFactor, 1);
+			cublasSscal(n - i - 1, 1 / factor[0], at(offset, 1), 1);
+			cublasSger(n - i - 1, n - i - 1, -1.0f, at(offset, 1), 1, at(offset, n), n, at(offset, n + 1), n);
+		}
+		return pivots;
+	}
+
+	private static void cudaSgetri(int n, Pointer dA, int[] pivots) {
+		// Perform inv(U)
+		cudaStrtri(n, dA);
+
+		// Solve inv(A)*L = inv(U)
+		Pointer dWork = new Pointer();
+		cublasAlloc(n - 1, Sizeof.FLOAT, dWork);
+
+		for (int i = n - 1; i > 0; i--) {
+			Pointer offset = at(dA, ((i - 1) * n + i));
+			cudaMemcpy(dWork, offset, (n - 1) * Sizeof.FLOAT, cudaMemcpyDeviceToDevice);
+			cublasSscal(n - i, 0, offset, 1);
+			cublasSgemv('n', n, n - i, -1.0f, at(dA, i * n), n, dWork, 1, 1.0f, at(dA, ((i - 1) * n)), 1);
+		}
+
+		cublasFree(dWork);
+
+		// Pivot back to original order
+		for (int i = n - 1; i >= 0; i--) {
+			if (i != pivots[i]) {
+				cublasSswap(n, at(dA, i * n), 1, at(dA, pivots[i] * n), 1);
+			}
+		}
+
+	}
+
+	private static void cudaStrtri(int n, Pointer dA) {
+		float[] factor = { 0.0f };
+		Pointer pFactor = Pointer.to(factor);
+		for (int i = 0; i < n; i++) {
+			Pointer offset = at(dA, i * n);
+			cublasGetVector(1, Sizeof.FLOAT, at(offset, i), 1, pFactor, 1);
+			factor[0] = 1 / factor[0];
+			cublasSetVector(1, Sizeof.FLOAT, pFactor, 1, at(offset, i), 1);
+			cublasStrmv('u', 'n', 'n', i, dA, n, offset, 1);
+			cublasSscal(i, -factor[0], offset, 1);
+		}
+	}
+
+	private static Pointer at(Pointer p, int floatOffset) {
+		return p.withByteOffset(floatOffset * Sizeof.FLOAT);
+	}
+
+	public static void multiply(int size, float A[], float B[], float C[]) {
+		Pointer dA = new Pointer();
+		Pointer dB = new Pointer();
+		Pointer dC = new Pointer();
+
+		cublasAlloc(size * size, Sizeof.FLOAT, dA);
+		cublasAlloc(size * size, Sizeof.FLOAT, dB);
+		cublasAlloc(size * size, Sizeof.FLOAT, dC);
+		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(A), 1, dA, 1);
+		cublasSetVector(size * size, Sizeof.FLOAT, Pointer.to(B), 1, dB, 1);
+
+		cublasSgemm('n', 'n', size, size, size, 1, dA, size, dB, size, 0, dC, size);
+
+		cublasGetVector(size * size, Sizeof.FLOAT, dC, 1, Pointer.to(C), 1);
+		cublasFree(dA);
+		cublasFree(dB);
+		cublasFree(dC);
+	}
+
 	/*
 	 * testing
 	 */
@@ -47,12 +166,11 @@ public class TsoleCuda {
 			}
 		}
 
-		System.out.println("macierz length  = " +  macierz.length);
+		System.out.println("macierz length  = " + macierz.length);
 		System.out.println(macierz[0].length);
-		
+
 		float wektor[] = macierz[0];
 
-		
 		System.out.println(wektor.length);
 	}
 
@@ -128,60 +246,59 @@ public class TsoleCuda {
 		}
 		return sb.toString();
 	}
-	
+
 	/**
 	 * funckja zamieniajaca macierz na wektor potrzebny do jcudy
 	 * 
 	 */
-	
-	public static float[] matrixToVector(float[][] macierz, int rows, int cols){
+
+	public static float[] matrixToVector(float[][] macierz, int rows, int cols) {
 		List<Float> tempVector = new ArrayList<>();
-		
-//		for(int i =0; i < rows;i++){
-//			for(int j = 0; j < cols; j++)
-//				tempVector.add(macierz[i][j]);
-//		}
-//		
-//		float[] jcudaVector = new float[tempVector.size()];
-//		
-//		for(int i=0; i < tempVector.size(); i++){
-//			jcudaVector[i] = tempVector.get(i);
-//		}
-		
+
+		// for(int i =0; i < rows;i++){
+		// for(int j = 0; j < cols; j++)
+		// tempVector.add(macierz[i][j]);
+		// }
+		//
+		// float[] jcudaVector = new float[tempVector.size()];
+		//
+		// for(int i=0; i < tempVector.size(); i++){
+		// jcudaVector[i] = tempVector.get(i);
+		// }
+
 		/* specjalnie odwrotna kolejnosc */
-		
-		for(int i =0; i < rows;i++){
-			for(int j = 0; j < cols; j++)
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++)
 				tempVector.add(macierz[j][i]);
 		}
-		
+
 		float[] jcudaVector = new float[tempVector.size()];
-		
-		for(int i=0; i < tempVector.size(); i++){
+
+		for (int i = 0; i < tempVector.size(); i++) {
 			jcudaVector[i] = tempVector.get(i);
 		}
-		
+
 		return jcudaVector;
 	}
 
 	/**
 	 * funkcje zamieniajca wektor na macierz
 	 */
-	
-	public static float[][] vectorToMAtrix(float[] vector, int rows, int cols){
-		
+
+	public static float[][] vectorToMAtrix(float[] vector, int rows, int cols) {
+
 		float matrix[][] = new float[rows][cols];
 		int i = 0;
-		
-		for(int j = 0; j < rows; j++){
-			for(int k =0; k < cols; k++){
+
+		for (int j = 0; j < rows; j++) {
+			for (int k = 0; k < cols; k++) {
 				matrix[j][k] = vector[i];
 				i++;
 			}
 		}
-		
+
 		return matrix;
 	}
-	
 
 }
