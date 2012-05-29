@@ -127,7 +127,7 @@ public class TsoleCuda {
 		
 		inverseUpperTriangle(n, pa);
 
-		// Solve inv(A)*L = inv(U)
+		// inv(A)*L = inv(U)
 		Pointer dWork = new Pointer();
 		cublasAlloc(n - 1, Sizeof.FLOAT, dWork);
 
