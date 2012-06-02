@@ -27,10 +27,6 @@ import jcuda.jcublas.JCublas;
  * 
  * @author marek
  * 
- * 
- *         Macierz przechowywana jest jako wektor + informacja o ilosci kolumn
- * 
- * 
  *         -interesujace funkcje
  * 
  *         cublasSsymm
@@ -40,8 +36,10 @@ import jcuda.jcublas.JCublas;
  *         cublasStrsm -
  * 
  *         cublesZgemm
+ *         
+ *         Klasa pomocnicza sluzaca do konwersji macierzy/wektora do i z gpu.
  */
-public class TsoleCuda {
+public class TsoleUtils {
 
 	/**
 	 * 
@@ -200,7 +198,7 @@ public class TsoleCuda {
 	 */
 	public static void main(String args[]) {
 
-		new TsoleCuda().przechowywanieMacierzy();
+		new TsoleUtils().przechowywanieMacierzy();
 
 		System.out.println("test macierz");
 
@@ -354,21 +352,6 @@ public class TsoleCuda {
 				combined.add(matrix2[j][i]);
 			}
 		}
-
-//		for(int i =0; i < rows2; i++){
-//			for(int j=0; j < cols2; j++){
-//				combined.add(matrix2[i][j]);
-//			}
-//		}
-		
-//		for(float it: matrix2[0]){
-//			combinedVector[i++] =it;
-//		}
-//		for(i = rows1*cols1; i < rows2; i++){
-//			for(int j=0; j < cols2; j++)
-//				combinedVector[(i*rows1) + j]= matrix2[j][i];
-//		}
-//		
 		
 		int i = 0;
 		for(float it: combined)
@@ -378,7 +361,22 @@ public class TsoleCuda {
 		return combinedVector;
 	}
 	
-	
+	/**
+	 * 
+	 * @param vector
+	 * 			wektor wynikowy bedaca zlaczeniem ( A | X ) przechowywany w formacie odpowiednim dla cudy
+	 * @return
+	 * 		float[] results  ostatnia kolumne macierzy pobrana z wektora
+	 */
+	public static float[] getResultsFromResultVector(float[] vector, int rows, int cols){
+		int lenght = rows*cols;
+		float[] result = new float[rows];
+		
+		for(int i =0; i < rows; i++)
+			result[i] = vector[lenght - rows + i];
+		
+		return result;
+	}
 	
 	
 	
