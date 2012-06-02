@@ -69,10 +69,6 @@ public class CudaGaussJordan implements IMatrixCompute {
 						//kopiowanie i-tego wiersza
 						JCublas.cublasScopy(cols, pa.withByteOffset(i*Sizeof.FLOAT), rows, pj, 1);
 						/* pobranie wspolczynnika przez ktory ma dzielic A(j,i)  i  mnozenie i-tego wiersza przez A(j,i) */
-						/**
-						 * TODO:
-						 * sprawdzic funkcje mnozaca wektor*wektor zamiast pobierac skalar
-						 */
 						JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset((i*rows + j)*Sizeof.FLOAT), 1, Pointer.to(multiplyFactor), 1);
 						JCublas.cublasSscal(cols, multiplyFactor[0], pj, 1); 
 						
