@@ -43,6 +43,9 @@ public class GaussJordan implements ISequenceAlgorithm{
 		PropertyConfigurator.configure("log4j.properties");
 		float[][] matrixA = IOLogic.readMatrix("matrixA");
 		float[][] matrixB = IOLogic.readMatrix("matrixB");
+//		float[][] matrixA = IOLogic.readMatrix("matrix_simple_a");
+//		float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
+
 		GaussJordan gj = new GaussJordan(matrixA, matrixB);
 		IOLogic.printMatrix(gj.run());
 	}

@@ -283,18 +283,7 @@ public class TsoleCuda {
 	public static float[] matrixToVector(float[][] macierz, int rows, int cols) {
 		List<Float> tempVector = new ArrayList<>();
 
-		// for(int i =0; i < rows;i++){
-		// for(int j = 0; j < cols; j++)
-		// tempVector.add(macierz[i][j]);
-		// }
-		//
-		// float[] jcudaVector = new float[tempVector.size()];
-		//
-		// for(int i=0; i < tempVector.size(); i++){
-		// jcudaVector[i] = tempVector.get(i);
-		// }
-
-		/* specjalnie odwrotna kolejnosc */
+		/* specjalnie odwrotna kolejnosc  aby bylo tak jak to przechowuje jcuda*/
 
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++)
@@ -318,15 +307,101 @@ public class TsoleCuda {
 
 		float matrix[][] = new float[rows][cols];
 		int i = 0;
+		
+		//wypelnianie macierzy idac po kolumnach 
 
-		for (int j = 0; j < rows; j++) {
-			for (int k = 0; k < cols; k++) {
-				matrix[j][k] = vector[i];
+		for (int j = 0; j < cols; j++) {
+			for (int k = 0; k < rows; k++) {
+				matrix[k][j] = vector[i];
 				i++;
 			}
 		}
 
 		return matrix;
 	}
+	
+	
+	/**
+	 * tworzy wektor akceptowany przez JCude, gdzie ostatnia kolumna sa wartosci z macierzy(wektora) Y // A * X = Y
+	 * 
+	 * [ 1 4 7 A ]
+	 * [ 2 5 8 B ]
+	 * [ 3 6 9 C ]
+	 *  A, B, C to elementry wektora Y
+	 *  
+	 * @param matrix
+	 * @param rows1
+	 * @param cols1
+	 * @param matrix2
+	 * @return
+	 */
+	public static float[] makeCombinedVectorFromMatrixes(float[][] matrix, int rows1, int cols1, float[][] matrix2, int rows2, int cols2){
+		float[] combinedVector = new float[rows1 * cols1 + rows2 * cols2];
+		List<Float> combined = new ArrayList<>();
+		
+		
+		//A
+		for (int i = 0; i < rows1; i++) {
+			for (int j = 0; j < cols1; j++)
+				combined.add(matrix[j][i]);
+//				combinedVector[(i* rows1) + j]=matrix[j][i];
+		}
+		
+		//Y- should be a vector ;p
+		
+		for(int i = 0; i < rows2; i++){
+			for(int j =0; j < cols2; j++){
+				combined.add(matrix2[j][i]);
+			}
+		}
+
+//		for(int i =0; i < rows2; i++){
+//			for(int j=0; j < cols2; j++){
+//				combined.add(matrix2[i][j]);
+//			}
+//		}
+		
+//		for(float it: matrix2[0]){
+//			combinedVector[i++] =it;
+//		}
+//		for(i = rows1*cols1; i < rows2; i++){
+//			for(int j=0; j < cols2; j++)
+//				combinedVector[(i*rows1) + j]= matrix2[j][i];
+//		}
+//		
+		
+		int i = 0;
+		for(float it: combined)
+			combinedVector[i++] = it;
+		
+		
+		return combinedVector;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
