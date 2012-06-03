@@ -1,51 +1,55 @@
 package pl.pw.edu.prir.tsole.sequence;
 
+import java.util.Arrays;
+
 import org.apache.log4j.PropertyConfigurator;
 
+import pl.pw.edu.prir.tsole.cuda.TsoleUtils;
 import pl.pw.edu.prir.tsole.io.IOLogic;
 
 public class Gauss implements ISequenceAlgorithm {
-	private float[][] matrixA;
-	private float[][] matrixB;
-//	private float[][] matrixA = {{3, 2, 1} , {2, 3, 1}, {1, 1, 4}};
-//	private float[][] matrixB = {{11}, {13}, {12}};
+	private float[][] matrix;
+	private static float[][] matrixA = {{0, 2, 1} , {2, 3, 1}, {1, 1, 4}};
+	private static float[][] matrixB = {{11}, {13}, {12}};
 	public Gauss(float[][] A,  float[][] B) {
-		this.matrixA = A;
-		this.matrixB = B;
+		this.matrix = TsoleUtils.joinMatrix(A, B);
 	}
 	
 	public float[][] run() {
 		float wsp;
-		int m = matrixA.length;
-		int n = matrixA[0].length;
-		IOLogic.printMatrix(matrixA);
-		IOLogic.printMatrix(matrixB);
+		int m = matrix.length;
+		int n = matrix[0].length;
 		for(int i = 0; i<m; i++) {
-			wsp = matrixA[i][i];
-			for(int j=0; j<n; j++) {
-				matrixA[i][j] = matrixA[i][j]/wsp;
-			}
-			matrixB[i][0] = matrixB[i][0]/wsp;
-			for(int j=i+1; j<m; j++) {
-				wsp = matrixA[j][i];
-				for(int k=0; k<n; k++) {
-					matrixA[j][k] = matrixA[j][k] - matrixA[i][k] * wsp;
+			wsp = matrix[i][i];
+			if(wsp == 0) { // szukanie najwiekszego i podmiana
+				int nonZeroRowIndex = i;
+				for(int j=i+1; j<m; j++) {
+					if(matrix[j][i] != 0) {
+						nonZeroRowIndex = j;
+						break;
+					}					
 				}
-				matrixB[j][0] = matrixB[j][0] - matrixB[i][0]*wsp;
+				TsoleUtils.swapRows(matrix, i, nonZeroRowIndex);
+				wsp = matrix[i][i];
 			}
-			IOLogic.printMatrix(matrixA);
-			IOLogic.printMatrix(matrixB);
 			
+			for(int j=0; j<n; j++) {
+				matrix[i][j] = matrix[i][j]/wsp;
+			}
+			for(int j=i+1; j<m; j++) {
+				wsp = matrix[j][i];
+				for(int k=0; k<n; k++) {
+					matrix[j][k] = matrix[j][k] - matrix[i][k] * wsp;
+				}
+			}
+			IOLogic.printMatrix(matrix);
 		}
-		IOLogic.printMatrix(matrixB);
 		float[][] result = new float[m][1];
 		for(int i=m-1; i>=0; i--) {
-//			System.out.println(i);
-			float s = matrixB[i][0];
+			float s = matrix[i][n-1];
 			
-			for(int j=n-1; j>i; j--) {
-				System.out.println(j + " " + s + " " + matrixA[i][j]);
-				s = s - matrixA[i][j] * result[j][0];
+			for(int j=n-2; j>i; j--) {
+				s = s - matrix[i][j] * result[j][0];
 			}
 			result[i][0] = s;
 		}
@@ -55,8 +59,8 @@ public class Gauss implements ISequenceAlgorithm {
 	
 	public static void main(String... args) {
 		PropertyConfigurator.configure("log4j.properties");
-		float[][] matrixA = IOLogic.readMatrix("matrixA");
-		float[][] matrixB = IOLogic.readMatrix("matrixB");
+//		float[][] matrixA = IOLogic.readMatrix("matrixA");
+//		float[][] matrixB = IOLogic.readMatrix("matrixB");
 		Gauss gj = new Gauss(matrixA, matrixB);
 		IOLogic.printMatrix(gj.run());
 	}
