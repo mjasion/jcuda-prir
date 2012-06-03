@@ -57,7 +57,7 @@ public class CudaGauss implements IMatrixCompute {
 		// algorytm
 		
 		// 1) Eliminacja zmiennych
-		JCublas.printMatrix(cols, pa, rows);
+//		JCublas.printMatrix(cols, pa, rows);
 		
 		for (int i = 0; i < rows; i++) {
 			// pobierz wspolczynnik matrix[i][i]
@@ -92,7 +92,7 @@ public class CudaGauss implements IMatrixCompute {
 //			JCublas.printMatrix(cols, pa, rows);
 
 		}
-		JCublas.printMatrix(cols, pa, rows);
+//		JCublas.printMatrix(cols, pa, rows);
 
 		// 2) waskie gardlo, czesc sekwencyjna - Podstawianie odwrotne
 
