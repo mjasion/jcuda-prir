@@ -96,7 +96,7 @@ public class CudaGaussJordan implements IMatrixCompute {
 			}
 //			JCublas.printMatrix(cols, pa, rows);
 		}
-	JCublas.printMatrix(cols, pa, rows);
+//	JCublas.printMatrix(cols, pa, rows);
 	
 	//pobranie macierzy wynikowej (A | X) z gpu
 	JCublas.cublasGetVector(rows*cols, Sizeof.FLOAT, pa, 1, Pointer.to(resultMatrix), 1);
