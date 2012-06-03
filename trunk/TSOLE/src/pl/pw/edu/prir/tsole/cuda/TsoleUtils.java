@@ -147,6 +147,19 @@ public class TsoleUtils {
 
 	}
 	
+	public static int getMaxRowIndex(float[][] matrix, int index, int rowBeg, int rowEnd) {
+		int nonZeroRowIndex = rowBeg;
+		float max = matrix[index][index];
+		
+		for(int j=rowBeg+1; j<rowEnd; j++) {
+			if(matrix[j][index] > max ) {
+				nonZeroRowIndex = j;
+				max = matrix[j][index];
+			}					
+		}
+		return nonZeroRowIndex;
+	}
+	
 	public static void swapRows(float[][] matrix, int i, int nonZeroRowIndex) {
 		int length =  matrix[i].length;
 		float[] row = Arrays.copyOf(matrix[i], length);
@@ -170,4 +183,35 @@ public class TsoleUtils {
 
 		return matrix;
 	}
+	
+	public static void printMatrix(float[][] matrix) {
+		int m = matrix.length;
+		int n = matrix[0].length;
+		System.out.println(m + "x" + n);
+		for(int i=0; i<m; i++) {
+			System.out.println(Arrays.toString(matrix[i]));
+		}
+		
+	}
+	
+	public static void printMatrix(double[][] matrix) {
+		int m = matrix.length;
+		int n = matrix[0].length;
+		System.out.println(m + "x" + n);
+		for(int i=0; i<m; i++) {
+			System.out.println(Arrays.toString(matrix[i]));
+		}
+		
+	}
+	
+	
+	public static void printMatrix(float[] matrix) {
+		int m = matrix.length;
+		System.out.println(m + "x" + 1);
+		for(int i=0; i<m; i++) {
+			System.out.println("[" + matrix[i] + "]");
+		}
+		
+	}
+	
 }
