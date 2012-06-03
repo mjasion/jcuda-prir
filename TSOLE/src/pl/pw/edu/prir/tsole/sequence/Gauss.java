@@ -62,9 +62,10 @@ public class Gauss implements ISequenceAlgorithm {
 	
 	public static void main(String... args) {
 		PropertyConfigurator.configure("log4j.properties");
-//		float[][] A = IOLogic.readMatrix("matrixA");
-//		float[][] B = IOLogic.readMatrix("matrixB");
-		Gauss gj = new Gauss(matrixA, matrixB);
+		float[][] A = IOLogic.readMatrix("matrixA");
+		float[][] B = IOLogic.readMatrix("matrixB");
+		Gauss gj = new Gauss(A, B);
+//		Gauss gj = new Gauss(matrixA, matrixB);
 		TsoleUtils.printMatrix(gj.run());
 	}
 }

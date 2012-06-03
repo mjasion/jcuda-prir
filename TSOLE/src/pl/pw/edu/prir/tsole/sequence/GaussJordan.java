@@ -4,10 +4,11 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import pl.pw.edu.prir.tsole.cuda.TsoleUtils;
+import pl.pw.edu.prir.tsole.io.IOLogic;
 
 public class GaussJordan implements ISequenceAlgorithm {
 	private static final Logger log = Logger.getLogger(GaussJordan.class);
-	
+
 	private float[][] matrix;
 	private static float[][] matrixA = { { 0, 2, 1 }, { 2, 3, 1 }, { 1, 1, 4 } };
 	private static float[][] matrixB = { { 11 }, { 13 }, { 12 } };
@@ -21,21 +22,20 @@ public class GaussJordan implements ISequenceAlgorithm {
 		int m = matrix.length;
 		int n = matrix[0].length;
 		float det = TsoleUtils.det(matrix);
-		if(det == 0) {
+		if (det == 0) {
 			log.error("Wyznacznik rowny zero ciulu!");
 			return new float[0][0];
 		}
-			
+
 		for (int i = 0; i < m; i++) {
 			wsp = matrix[i][i];
-			
-			if(wsp == 0) {
-				int nonZeroRowIndex = TsoleUtils.getMaxRowIndex(matrix,i, 0, m);
+
+			if (wsp == 0) {
+				int nonZeroRowIndex = TsoleUtils.getMaxRowIndex(matrix, i, 0, m);
 				TsoleUtils.swapRows(matrix, i, nonZeroRowIndex);
 				wsp = matrix[i][i];
 			}
-			
-			
+
 			for (int j = 0; j < n; j++) {
 				matrix[i][j] = matrix[i][j] / wsp;
 			}
@@ -61,10 +61,10 @@ public class GaussJordan implements ISequenceAlgorithm {
 
 	public static void main(String... args) {
 		PropertyConfigurator.configure("log4j.properties");
-		// float[][] A = IOLogic.readMatrix("matrixA");
-		// float[][] B = IOLogic.readMatrix("matrixB");
-//		GaussJordan gj = new GaussJordan(A, B);
-		GaussJordan gj = new GaussJordan(matrixA, matrixB);
+		float[][] A = IOLogic.readMatrix("matrixA");
+		float[][] B = IOLogic.readMatrix("matrixB");
+		GaussJordan gj = new GaussJordan(A, B);
+		// GaussJordan gj = new GaussJordan(matrixA, matrixB);
 		TsoleUtils.printMatrix(gj.run());
 	}
 }
