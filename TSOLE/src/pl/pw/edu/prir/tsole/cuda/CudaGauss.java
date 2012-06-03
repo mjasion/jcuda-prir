@@ -26,6 +26,8 @@ import pl.pw.edu.prir.tsole.io.IOLogic;
  * 
  */
 public class CudaGauss implements IMatrixCompute {
+	private static float[][] matA = {{0, 2, 1} , {2, 3, 1}, {1, 1, 4}};
+	private static float[][] matB = {{11}, {13}, {12}};
 
 	@Override
 	public float[] computeMatrix(float[][] A, float[][] Y) {
@@ -61,7 +63,17 @@ public class CudaGauss implements IMatrixCompute {
 			// pobierz wspolczynnik matrix[i][i]
 			JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset(((i * rows) + i) * Sizeof.FLOAT), 1, Pointer.to(diagonal), 1);
 
-			// podziel wiersz [i] przez diagonal
+			if(diagonal[0] == 0){
+				//1. znajdz indeks najwiekszego elementu w i-tej kolumnie
+				int indexMax = JCublas.cublasIsamax(rows-i, pa.withByteOffset((i*rows + i) * Sizeof.FLOAT), 1);	//!	tylko elementy w kolumnie ponizej danego
+				//uzgodnic z numeracja
+				indexMax= indexMax-1;
+				//2. zamien wiersze
+				JCublas.cublasSswap(cols, pa.withByteOffset((i*rows) * Sizeof.FLOAT), rows, pa.withByteOffset((indexMax) * Sizeof.FLOAT), rows);
+				//3. wez nowy wspolczynnik
+				JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset(((i * rows) + i) * Sizeof.FLOAT), 1, Pointer.to(diagonal), 1);
+			}
+			// podziel wiersz [i] przez diagonal 
 			float wsp = (float) (1 / diagonal[0]);
 //			JCublas.printVector(1, pa.withByteOffset(i * Sizeof.FLOAT));	//wypisanie odwrotnosci wsp diag
 			JCublas.cublasSscal(cols, wsp, pa.withByteOffset(i * Sizeof.FLOAT), rows);
@@ -93,12 +105,10 @@ public class CudaGauss implements IMatrixCompute {
 		
 		float[][] matrixAfterFirstStage = TsoleUtils.vectorToMAtrix(resultMatrix, rows, cols);
 		yVector = TsoleUtils.getResultsFromResultVector(resultMatrix, rows, cols);
-		System.out.println("***************RESULT VECTOR*******************");
 		float results[] = new float[rows];
 		
 		for(int i=rows-1; i>=0; i--) {
 			float s = yVector[i];
-			System.out.println(s);
 			
 			for(int j=preCols-1; j>i; j--) {
 				s =s - (matrixAfterFirstStage[i][j] * results[j]);
@@ -129,12 +139,20 @@ public class CudaGauss implements IMatrixCompute {
 		 float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
 		JCublas.cublasInit();
 		JCublas.setLogLevel(LogLevel.LOG_TRACE);
-
+		
+		
+//		float[] result = new CudaGauss().computeMatrix(matA, matB);
 		float[] result = new CudaGauss().computeMatrix(matrixA, matrixB);
 		System.out.println("\n\n**************** <RESULT> ********************");
 		TsoleUtils.printMatrix(result);
 		System.out.println("**************** </RESULT> ********************\n\n");
 		JCublas.cublasShutdown();
+		
+		/**
+		 * 3x1 		[-1.2000003] 
+		 * 			[4.4]
+		 *  		[2.2]
+		 */
 
 	}
 
