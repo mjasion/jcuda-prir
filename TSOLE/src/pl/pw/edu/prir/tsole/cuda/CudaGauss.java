@@ -132,7 +132,7 @@ public class CudaGauss implements IMatrixCompute {
 
 		float[] result = new CudaGauss().computeMatrix(matrixA, matrixB);
 		System.out.println("\n\n**************** <RESULT> ********************");
-		IOLogic.printMatrix(result);
+		TsoleUtils.printMatrix(result);
 		System.out.println("**************** </RESULT> ********************\n\n");
 		JCublas.cublasShutdown();
 

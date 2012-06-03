@@ -1,10 +1,6 @@
 package pl.pw.edu.prir.tsole;
 
-import static jcuda.jcublas.JCublas.cublasAlloc;
-import static jcuda.jcublas.JCublas.cublasSetMatrix;
 import jcuda.LogLevel;
-import jcuda.Pointer;
-import jcuda.Sizeof;
 import jcuda.jcublas.JCublas;
 
 import org.apache.log4j.PropertyConfigurator;
@@ -47,8 +43,8 @@ public class Main {
 		int rows = matrix.length;
 		int cols = matrix[0].length;
 
-		IOLogic.printMatrix(matrix);
-		IOLogic.printMatrix(matrix2);
+		TsoleUtils.printMatrix(matrix);
+		TsoleUtils.printMatrix(matrix2);
 
 
 		// inicjalizacja jcublas
