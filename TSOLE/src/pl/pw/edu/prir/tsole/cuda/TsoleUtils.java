@@ -1,6 +1,7 @@
 package pl.pw.edu.prir.tsole.cuda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -145,7 +146,28 @@ public class TsoleUtils {
 		return result;
 
 	}
-
+	
+	public static void swapRows(float[][] matrix, int i, int nonZeroRowIndex) {
+		int length =  matrix[i].length;
+		float[] row = Arrays.copyOf(matrix[i], length);
+		matrix[i] = Arrays.copyOf(matrix[nonZeroRowIndex], length);
+		matrix[nonZeroRowIndex] = Arrays.copyOf(row, length);
+	}
 	
 
+	public static float[][] joinMatrix(float[][] A, float[][] B) {
+		float[][] matrix = new float[A.length][A[0].length + 1];
+		int n = A[0].length; // pozycja na ktora wrzucac B
+		int m = A.length;
+		
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) {
+				matrix[i][j] = A[i][j];
+			}
+			System.out.println();
+			matrix[i][n] = B[i][0];
+		}
+
+		return matrix;
+	}
 }
