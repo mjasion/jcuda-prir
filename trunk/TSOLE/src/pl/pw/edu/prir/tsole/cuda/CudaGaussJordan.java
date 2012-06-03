@@ -25,6 +25,8 @@ import pl.pw.edu.prir.tsole.io.IOLogic;
  *         
  */
 public class CudaGaussJordan implements IMatrixCompute {
+	private static float[][] matA = {{0, 2, 1} , {2, 3, 1}, {1, 1, 4}};
+	private static float[][] matB = {{11}, {13}, {12}};
 
 	@Override
 	public float[] computeMatrix(float[][] A, float[][] Y) {
@@ -55,6 +57,19 @@ public class CudaGaussJordan implements IMatrixCompute {
 			
 			/*pobranie przekatnej */
 			JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset( ((i*rows) + i)*Sizeof.FLOAT), 1, Pointer.to(diagonal), 1);
+			
+			if(diagonal[0] == 0){
+				//1. znajdz indeks najwiekszego elementu w i-tej kolumnie
+				int indexMax = JCublas.cublasIsamax(rows, pa.withByteOffset((i*rows) * Sizeof.FLOAT), 1);	//
+				indexMax= indexMax-1;
+				//2. zamien wiersze
+				JCublas.cublasSswap(cols, pa.withByteOffset((i*rows) * Sizeof.FLOAT), rows, pa.withByteOffset((indexMax) * Sizeof.FLOAT), rows);
+				
+				//3. wez nowy wspolczynnik
+				JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset(((i * rows) + i) * Sizeof.FLOAT), 1, Pointer.to(diagonal), 1);
+			}
+			
+			
 			if(diagonal[0] != 0){
 				//podziel wiersz [i] przez macierz[i][i]
 				
@@ -109,7 +124,9 @@ public class CudaGaussJordan implements IMatrixCompute {
 		JCublas.setLogLevel(LogLevel.LOG_TRACE);
 		
 		
-		float[] result = new CudaGaussJordan().computeMatrix(matrixA, matrixB);
+//		float[] result = new CudaGaussJordan().computeMatrix(matrixA, matrixB);
+		float[] result = new CudaGaussJordan().computeMatrix(matA, matB);
+		
 		System.out.println("\n\n**************** <RESULT> ********************");
 		TsoleUtils.printMatrix(result);
 		System.out.println("**************** </RESULT> ********************\n\n");
