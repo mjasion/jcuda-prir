@@ -151,12 +151,13 @@ public class TsoleUtils {
 		int nonZeroRowIndex = rowBeg;
 		float max = matrix[index][index];
 		
-		for(int j=rowBeg+1; j<rowEnd; j++) {
-			if(matrix[j][index] > max ) {
+		for(int j=rowBeg; j<rowEnd; j++) {
+			if(Math.abs(matrix[j][index]) > max ) {
 				nonZeroRowIndex = j;
-				max = matrix[j][index];
+				max = Math.abs(matrix[j][index]);
 			}					
 		}
+		
 		return nonZeroRowIndex;
 	}
 	
