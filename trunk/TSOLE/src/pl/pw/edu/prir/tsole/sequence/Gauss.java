@@ -1,12 +1,9 @@
 package pl.pw.edu.prir.tsole.sequence;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import pl.pw.edu.prir.tsole.cuda.TsoleUtils;
-import pl.pw.edu.prir.tsole.io.IOLogic;
 
 public class Gauss implements ISequenceAlgorithm {
 	private static final Logger log = Logger.getLogger(GaussJordan.class);
@@ -21,6 +18,10 @@ public class Gauss implements ISequenceAlgorithm {
 		float wsp;
 		int m = matrix.length;
 		int n = matrix[0].length;
+		
+		long start = System.nanoTime();
+		long end;
+		
 		float det = TsoleUtils.det(matrix);
 		if(det == 0) {
 			log.error("Wyznacznik rowny zero ciulu!");
@@ -57,6 +58,8 @@ public class Gauss implements ISequenceAlgorithm {
 			result[i][0] = s;
 		}
 		
+		end = System.nanoTime();
+		System.out.println("\n[Gauss] czas obliczeń : "+ (end-start)+ " ns.");
 		return result;
 	}
 	
