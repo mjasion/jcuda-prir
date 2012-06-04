@@ -31,6 +31,9 @@ public class CudaGauss implements IMatrixCompute {
 
 	@Override
 	public float[] computeMatrix(float[][] A, float[][] Y) {
+		
+		long start = System.nanoTime();
+		long end,allocTime;
 
 		int rows = A.length;
 		int preCols = A[0].length;
@@ -53,7 +56,7 @@ public class CudaGauss implements IMatrixCompute {
 		cublasAlloc( cols, Sizeof.FLOAT, pi);
 		// kopiowanie do gpu
 		JCublas.cublasSetVector(rows * cols, Sizeof.FLOAT, Pointer.to(combinedVector), 1, pa, 1);
-
+		allocTime = System.nanoTime();
 		// algorytm
 		
 		// 1) Eliminacja zmiennych
@@ -122,6 +125,11 @@ public class CudaGauss implements IMatrixCompute {
 		
 		JCublas.cublasFree(pi);
 		JCublas.cublasFree(pa);
+		
+		end = System.nanoTime();
+		System.out.println("[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
+		System.out.println("[Cuda Gauss] czas samych obliczeń  : " + (end-allocTime));
+		System.out.println("[Cuda Gauss] całkowity czas dzialania  : " + (end-start));
 
 		return results;
 	}

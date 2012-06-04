@@ -30,7 +30,10 @@ public class CudaGaussJordan implements IMatrixCompute {
 
 	@Override
 	public float[] computeMatrix(float[][] A, float[][] Y) {
-
+		
+		long start = System.nanoTime();
+		long end,allocTime;
+		
 		int rows = A.length;
 		int preCols = A[0].length;
 		int cols = preCols + 1; // ilosc kolumn w macierzy polaczonej ( [A|Y] )
@@ -52,7 +55,7 @@ public class CudaGaussJordan implements IMatrixCompute {
 		cublasAlloc(cols, Sizeof.FLOAT, pj);
 		//kopiowanie do gpu
 		JCublas.cublasSetVector(rows * cols, Sizeof.FLOAT, Pointer.to(combinedVector), 1, pa, 1);
-		
+		allocTime = System.nanoTime();
 	for(int i=0; i < rows; i++){
 			
 			/*pobranie przekatnej */
@@ -87,7 +90,7 @@ public class CudaGaussJordan implements IMatrixCompute {
 						JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset((i*rows + j)*Sizeof.FLOAT), 1, Pointer.to(multiplyFactor), 1);
 						JCublas.cublasSscal(cols, multiplyFactor[0], pj, 1); 
 						
-						//odjecie Saxpy
+						//odjecie Saxpyz
 						JCublas.cublasSaxpy(cols, -1, pj, 1, pa.withByteOffset(j*Sizeof.FLOAT), rows);
 						
 					}
@@ -104,7 +107,10 @@ public class CudaGaussJordan implements IMatrixCompute {
 	JCublas.cublasFree(pj);
 	JCublas.cublasFree(pa);
 	
-	
+	end = System.nanoTime();
+	System.out.println("[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
+	System.out.println("[Cuda Gauss] czas samych obliczeń  : " + (end-allocTime));
+	System.out.println("[Cuda Gauss] całkowity czas dzialania  : " + (end-start));
 	
 	return TsoleUtils.getResultsFromResultVector(resultMatrix, rows, cols);
 	}
@@ -116,16 +122,16 @@ public class CudaGaussJordan implements IMatrixCompute {
 	 */
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("log4j.properties");
-		float[][] matrixA = IOLogic.readMatrix("matrixA");
-		float[][] matrixB = IOLogic.readMatrix("matrixB");
-//		 float[][] matrixA = IOLogic.readMatrix("matrix_simple_a");
-//		 float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
+//		float[][] matrixA = IOLogic.readMatrix("matrixA");
+//		float[][] matrixB = IOLogic.readMatrix("matrixB");
+		 float[][] matrixA = IOLogic.readMatrix("matrix_simple_a");
+		 float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
 		JCublas.cublasInit();
 		JCublas.setLogLevel(LogLevel.LOG_TRACE);
 		
 		
-//		float[] result = new CudaGaussJordan().computeMatrix(matrixA, matrixB);
-		float[] result = new CudaGaussJordan().computeMatrix(matA, matB);
+		float[] result = new CudaGaussJordan().computeMatrix(matrixA, matrixB);
+//		float[] result = new CudaGaussJordan().computeMatrix(matA, matB);
 		
 		System.out.println("\n\n**************** <RESULT> ********************");
 		TsoleUtils.printMatrix(result);
