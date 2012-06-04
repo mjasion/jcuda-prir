@@ -23,7 +23,6 @@ import pl.pw.edu.prir.tsole.sequence.GaussJordan;
  *
  * TODO:
  * 	1. dorobic sprawdzanie czy wymiary macierzy sa odpowiednie
- * 	2. dodatkowy argument w wywolania pozwalajacy uzyskac logowanie dzialania jcublas np. -l
  *
  */
 
@@ -48,8 +47,8 @@ public class Main {
 //		int rows = matrix.length;
 //		int cols = matrix[0].length;
 
-		TsoleUtils.printMatrix(matrix);
-		TsoleUtils.printMatrix(matrix2);
+//		TsoleUtils.printMatrix(matrix);
+//		TsoleUtils.printMatrix(matrix2);
 
 
 		// inicjalizacja jcublas

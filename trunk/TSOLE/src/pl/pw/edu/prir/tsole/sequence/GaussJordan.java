@@ -61,7 +61,7 @@ public class GaussJordan implements ISequenceAlgorithm {
 		}
 
 		end = System.nanoTime();
-		System.out.println("\n[Gauss-Jordan] czas obliczeń : "+ (end-start)+ " ns.");
+		System.out.println("\n[Gauss-Jordan] czas obliczeń : "+ (end-start)+ " ns. [" + ((end-start)/1000000000.00)+" s]");
 		
 		return result;
 	}

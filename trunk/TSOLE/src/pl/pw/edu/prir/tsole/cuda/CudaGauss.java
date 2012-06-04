@@ -126,9 +126,9 @@ public class CudaGauss implements IMatrixCompute {
 		JCublas.cublasFree(pa);
 		
 		end = System.nanoTime();
-		System.out.println("\n[Cuda Gauss] czas alokacji głównej macierzy(wektora) do gpu : " + (allocTime-start) +" ns.");
-		System.out.println("[Cuda Gauss] czas obliczeń  : " + (end-allocTime) +" ns.");
-		System.out.println("[Cuda Gauss] całkowity czas działania  : " + (end-start) +" ns.");
+		System.out.println("\n[Cuda Gauss] czas alokacji głównej macierzy(wektora) do gpu : " + (allocTime-start) +" ns. [" + ((allocTime-start)/1000000000.00)+" s]");
+		System.out.println("[Cuda Gauss] czas obliczeń  : " + (end-allocTime) +" ns. [" + ((end-allocTime)/1000000000.00)+" s]");
+		System.out.println("[Cuda Gauss] całkowity czas działania  : " + (end-start) +" ns. [" + ((end-start)/1000000000.00)+" s]");
 
 		return results;
 	}
