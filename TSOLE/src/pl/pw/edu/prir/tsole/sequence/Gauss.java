@@ -59,7 +59,7 @@ public class Gauss implements ISequenceAlgorithm {
 		}
 		
 		end = System.nanoTime();
-		System.out.println("\n[Gauss] czas obliczeń : "+ (end-start)+ " ns.");
+		System.out.println("\n[Gauss] czas obliczeń : "+ (end-start)+ " ns. [" + ((end-start)/1000000000.00)+" s]");
 		return result;
 	}
 	
