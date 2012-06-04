@@ -178,7 +178,6 @@ public class TsoleUtils {
 			for (int j = 0; j < n; j++) {
 				matrix[i][j] = A[i][j];
 			}
-			System.out.println();
 			matrix[i][n] = B[i][0];
 		}
 
