@@ -24,7 +24,7 @@ public class Gauss implements ISequenceAlgorithm {
 		
 		float det = TsoleUtils.det(matrix);
 		if(det == 0) {
-			log.error("Wyznacznik rowny zero ciulu!");
+			log.error("Wyznacznik rowny zero!");
 			return new float[0][0];
 		}
 			
