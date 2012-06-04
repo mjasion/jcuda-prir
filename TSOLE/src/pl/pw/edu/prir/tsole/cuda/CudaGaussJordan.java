@@ -114,9 +114,9 @@ public class CudaGaussJordan implements IMatrixCompute {
 	JCublas.cublasFree(pa);
 	
 	end = System.nanoTime();
-	System.out.println("\n\n[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
-	System.out.println("[Cuda Gauss] czas samych obliczeń  : " + (end-allocTime));
-	System.out.println("[Cuda Gauss] całkowity czas dzialania  : " + (end-start));
+	System.out.println("\n[Cuda Gauss-Jordan] czas alokacji głównej macierzy(wektora) do gpu : " + (allocTime-start) + " ns.");
+	System.out.println("[Cuda Gauss-Jordan] czas obliczeń  : " + (end-allocTime) + " ns.");
+	System.out.println("[Cuda Gauss-Jordan] całkowity czas działania  : " + (end-start) + " ns.");
 	
 	return TsoleUtils.getResultsFromResultVector(resultMatrix, rows, cols);
 	}

@@ -21,6 +21,10 @@ public class GaussJordan implements ISequenceAlgorithm {
 		float wsp;
 		int m = matrix.length;
 		int n = matrix[0].length;
+
+		long start = System.nanoTime();
+		long end;
+		
 		float det = TsoleUtils.det(matrix);
 		if (det == 0) {
 			log.error("Wyznacznik rowny zero ciulu!");
@@ -56,6 +60,9 @@ public class GaussJordan implements ISequenceAlgorithm {
 			result[i][0] = matrix[i][n - 1];
 		}
 
+		end = System.nanoTime();
+		System.out.println("\n[Gauss-Jordan] czas obliczeń : "+ (end-start)+ " ns.");
+		
 		return result;
 	}
 

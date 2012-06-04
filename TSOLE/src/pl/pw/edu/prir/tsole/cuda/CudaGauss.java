@@ -26,8 +26,6 @@ import pl.pw.edu.prir.tsole.io.IOLogic;
  * 
  */
 public class CudaGauss implements IMatrixCompute {
-	private static float[][] matA = {{0, 2, 1} , {2, 3, 1}, {1, 1, 4}};
-	private static float[][] matB = {{11}, {13}, {12}};
 
 	@Override
 	public float[] computeMatrix(float[][] A, float[][] Y) {
@@ -39,7 +37,6 @@ public class CudaGauss implements IMatrixCompute {
 		int preCols = A[0].length;
 		int cols = preCols + 1; // ilosc kolumn w macierzy polaczonej ( [A|Y] )
 
-		float[] yFactor = new float[1];
 		float[] multiplyFactor = new float[1];
 		float[] diagonal = new float[1];
 
@@ -129,9 +126,9 @@ public class CudaGauss implements IMatrixCompute {
 		JCublas.cublasFree(pa);
 		
 		end = System.nanoTime();
-		System.out.println("\n\n[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
-		System.out.println("[Cuda Gauss] czas samych obliczeń  : " + (end-allocTime));
-		System.out.println("[Cuda Gauss] całkowity czas dzialania  : " + (end-start));
+		System.out.println("\n[Cuda Gauss] czas alokacji głównej macierzy(wektora) do gpu : " + (allocTime-start) +" ns.");
+		System.out.println("[Cuda Gauss] czas obliczeń  : " + (end-allocTime) +" ns.");
+		System.out.println("[Cuda Gauss] całkowity czas działania  : " + (end-start) +" ns.");
 
 		return results;
 	}
