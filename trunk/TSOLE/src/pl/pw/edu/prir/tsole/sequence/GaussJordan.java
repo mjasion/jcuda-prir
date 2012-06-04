@@ -10,7 +10,7 @@ public class GaussJordan implements ISequenceAlgorithm {
 	private static final Logger log = Logger.getLogger(GaussJordan.class);
 
 	private float[][] matrix;
-	private static float[][] matrixA = { { 0, 2, 1 }, { 2, 3, 1 }, { 1, 1, 4 } };
+	private static float[][] matrixA = { { 0, 2, 1 }, { 2, 0, 1 }, { 1, 1, 4 } };
 	private static float[][] matrixB = { { 11 }, { 13 }, { 12 } };
 
 	public GaussJordan(float[][] A, float[][] B) {
@@ -63,8 +63,8 @@ public class GaussJordan implements ISequenceAlgorithm {
 		PropertyConfigurator.configure("log4j.properties");
 		float[][] A = IOLogic.readMatrix("matrixA");
 		float[][] B = IOLogic.readMatrix("matrixB");
-		GaussJordan gj = new GaussJordan(A, B);
-		// GaussJordan gj = new GaussJordan(matrixA, matrixB);
+//		GaussJordan gj = new GaussJordan(A, B);
+		 GaussJordan gj = new GaussJordan(matrixA, matrixB);
 		TsoleUtils.printMatrix(gj.run());
 	}
 }
