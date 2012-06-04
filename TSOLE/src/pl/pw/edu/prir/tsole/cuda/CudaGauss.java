@@ -77,7 +77,9 @@ public class CudaGauss implements IMatrixCompute {
 				JCublas.cublasGetVector(1, Sizeof.FLOAT, pa.withByteOffset(((i * rows) + i) * Sizeof.FLOAT), 1, Pointer.to(diagonal), 1);
 			}
 			// podziel wiersz [i] przez diagonal 
-			float wsp = (float) (1 / diagonal[0]);
+			float wsp =1;
+			if(diagonal[0] != 0)
+				wsp  =(1 / diagonal[0]);
 //			JCublas.printVector(1, pa.withByteOffset(i * Sizeof.FLOAT));	//wypisanie odwrotnosci wsp diag
 			JCublas.cublasSscal(cols, wsp, pa.withByteOffset(i * Sizeof.FLOAT), rows);
 			
@@ -127,7 +129,7 @@ public class CudaGauss implements IMatrixCompute {
 		JCublas.cublasFree(pa);
 		
 		end = System.nanoTime();
-		System.out.println("[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
+		System.out.println("\n\n[Cuda Gauss] czas alokacja glownej macierz(wektora) do gpu : " + (allocTime-start) );
 		System.out.println("[Cuda Gauss] czas samych obliczeń  : " + (end-allocTime));
 		System.out.println("[Cuda Gauss] całkowity czas dzialania  : " + (end-start));
 
@@ -143,10 +145,12 @@ public class CudaGauss implements IMatrixCompute {
 		PropertyConfigurator.configure("log4j.properties");
 //		float[][] matrixA = IOLogic.readMatrix("matrixA");
 //		float[][] matrixB = IOLogic.readMatrix("matrixB");
-		 float[][] matrixA = IOLogic.readMatrix("matrix_simple_a");
-		 float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
+//		 float[][] matrixA = IOLogic.readMatrix("matrix_simple_a");
+//		 float[][] matrixB = IOLogic.readMatrix("matrix_simple_b");
+		 float[][] matrixA = IOLogic.readMatrix("matrix1000_A");
+		 float[][] matrixB = IOLogic.readMatrix("matrix1000_B");
 		JCublas.cublasInit();
-		JCublas.setLogLevel(LogLevel.LOG_TRACE);
+//		JCublas.setLogLevel(LogLevel.LOG_TRACE);
 		
 		
 //		float[] result = new CudaGauss().computeMatrix(matA, matB);
