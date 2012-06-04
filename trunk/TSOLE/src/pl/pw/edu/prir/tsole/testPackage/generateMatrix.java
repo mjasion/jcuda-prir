@@ -18,10 +18,7 @@ public class generateMatrix {
 		float f;
 		int multiply;
 		String s;
-//		StringBuilder sb = new StringBuilder();
 		FileWriter fw = new FileWriter("matrix10000_B");
-//		System.out.println(size + "x" + size2);
-//		sb.append(size).append("x").append(size2).append("\n");
 		fw.write(size + "x"+size2+"\n");
 		for(int i =0; i < size; i++){
 			for(int j=0; j < size2; j++){
@@ -30,16 +27,11 @@ public class generateMatrix {
 				f *= multiply;
 				s = String.format("%2.1f", f);
 				fw.write(s + " ");
-//				sb.append(s).append(" ");
-//				System.out.print(s + " ");
 			}
 			fw.write("\n");
-//			sb.append("\n");
-//			System.out.println();
 		}
 		
 		
-//		fw.write(sb.toString());
 		fw.close();
 		System.out.println("done");
 	}
