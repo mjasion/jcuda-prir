@@ -15,8 +15,9 @@ import pl.pw.edu.prir.tsole.sequence.GaussJordan;
 
 /**
  * Parametry VM: -Djava.library.path=${workspace_loc:TSOLE/JCuda-0.4.1/lib}
+   Parametry uruchomienia: -a matrix_simple_a -b matrix_simple_b -m all
  * 
- * @author Marcin, marek
+ * @author Marcin, Marek, Tobiasz
  * 
  */
 
