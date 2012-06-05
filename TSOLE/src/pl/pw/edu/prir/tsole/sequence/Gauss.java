@@ -22,13 +22,6 @@ public class Gauss implements ISequenceAlgorithm {
 		long start = System.nanoTime();
 		long end;
 		
-		float det = TsoleUtils.det(matrix);
-		if(det == 0) {
-			log.error("Wyznacznik rowny zero!");
-			return new float[0][0];
-		}
-			
-		
 		for(int i = 0; i<m; i++) {
 			wsp = matrix[i][i];
 			

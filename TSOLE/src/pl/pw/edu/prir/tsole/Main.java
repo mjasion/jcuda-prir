@@ -59,7 +59,11 @@ public class Main {
 		// czy gadatliwy
 		if (isVerbose)
 			JCublas.setLogLevel(LogLevel.LOG_TRACE);
-		
+		float det = TsoleUtils.det(matrix);
+		if(det == 0) {
+			log.error("Wyznacznik rowny zero!");
+			return;
+		}
 		//wybor metody
 		if (methodSelected.equals(Manual.METHOD_ALL)) {
 			Gauss gauss = new Gauss(matrix, matrix2);
