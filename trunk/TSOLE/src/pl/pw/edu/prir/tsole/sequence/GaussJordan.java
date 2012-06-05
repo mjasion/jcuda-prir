@@ -25,12 +25,6 @@ public class GaussJordan implements ISequenceAlgorithm {
 		long start = System.nanoTime();
 		long end;
 		
-		float det = TsoleUtils.det(matrix);
-		if (det == 0) {
-			log.error("Wyznacznik rowny zero ciulu!");
-			return new float[0][0];
-		}
-
 		for (int i = 0; i < m; i++) {
 			wsp = matrix[i][i];
 
