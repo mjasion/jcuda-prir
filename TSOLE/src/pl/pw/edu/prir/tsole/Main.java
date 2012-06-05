@@ -3,6 +3,7 @@ package pl.pw.edu.prir.tsole;
 import jcuda.LogLevel;
 import jcuda.jcublas.JCublas;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import pl.pw.edu.prir.tsole.cuda.CudaGauss;
@@ -27,7 +28,7 @@ import pl.pw.edu.prir.tsole.sequence.GaussJordan;
  */
 
 public class Main {
-
+	private static final Logger log = Logger.getLogger(Main.class);
 	private static String pathToMatrixA = null;
 	private static String pathToMatrixB = null;
 	private static String pathToOutputFile = null;
