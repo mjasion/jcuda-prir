@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import pl.pw.edu.prir.tsole.sequence.GaussJordan;
+
 /**
  * 
  * @author marek
@@ -12,7 +16,7 @@ import java.util.List;
  * Utilsy do konwersji macierzy/wektor na takie ,ktore sa zgodne z przechowywaniem w cudzie
  */
 public class TsoleUtils {
-
+	private static final Logger log = Logger.getLogger(TsoleUtils.class);
 
 	/**
 	 * funckja zamieniajaca macierz na wektor potrzebny do jcudy
